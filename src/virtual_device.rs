@@ -248,8 +248,8 @@ impl DeviceDispatcher {
         self.pen_emit_touch(raw_data);
     }
     fn normalize_pressure(raw_pressure: i32) -> i32 {
-        let proximity_threshold = 600; // Adjust for proximity sensitivity
-        let strength_scaling = 2; // Adjust for strength of the press
+        let proximity_threshold = 250; // Adjust for proximity sensitivity
+        let strength_scaling = 8; // Adjust for strength of the press
     
         match 1740 - raw_pressure {
             x if x <= proximity_threshold => 0,
@@ -258,21 +258,23 @@ impl DeviceDispatcher {
     }
 
     fn raw_pen_abs_to_pen_abs_events(&mut self, x_axis: i32, y_axis: i32, pressure: i32) {
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_X.0,
-            x_axis,
-        )]).expect("Error emitting ABS_X.");
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_Y.0,
-            y_axis,
-        )]).expect("Error emitting ABS_Y.");
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_PRESSURE.0,
-            pressure,
-        )]).expect("Error emitting Pressure.");
+        self.virtual_pen.emit(&[
+            InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_X.0,
+                x_axis,
+            ),
+            InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_Y.0,
+                y_axis,
+            ),
+            InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_PRESSURE.0,
+                pressure,
+            ),
+        ]).expect("Error emitting pen events.");
     }
 
     fn pen_emit_touch(&mut self, raw_data: &RawDataReader) {
